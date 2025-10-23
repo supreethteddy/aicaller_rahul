@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { mockData } from '@/data/mockData';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 
 export interface BlandAICall {
@@ -26,12 +27,23 @@ export interface BlandAICall {
 }
 
 export const useBlandAICalls = () => {
+  const { user } = useAuth();
+  
   return useQuery({
-    queryKey: ['bland_ai_calls', 'mock-user-123'],
+    queryKey: ['bland_ai_calls', user?.id],
     queryFn: async () => {
-      return mockData.calls as BlandAICall[];
+      if (!user?.id) throw new Error('User not authenticated');
+
+      const { data, error } = await supabase
+        .from('bland_ai_calls')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data as BlandAICall[];
     },
-    enabled: true,
+    enabled: !!user?.id,
     refetchInterval: 10000,
     refetchIntervalInBackground: false,
     staleTime: 30000,
@@ -40,22 +52,26 @@ export const useBlandAICalls = () => {
 
 export const useCreateBlandAICall = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   return useMutation({
     mutationFn: async (callData: Omit<BlandAICall, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'ai_analysis' | 'lead_score' | 'qualification_status'>) => {
-      const newCall = {
-        id: `call-${Date.now()}`,
-        user_id: 'mock-user-123',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        ai_analysis: null,
-        lead_score: null,
-        qualification_status: null,
-        ...callData
-      };
+      if (!user?.id) throw new Error('User not authenticated');
 
-      mockData.calls.unshift(newCall);
-      return newCall;
+      const { data, error } = await supabase
+        .from('bland_ai_calls')
+        .insert({
+          ...callData,
+          user_id: user.id,
+          ai_analysis: null,
+          lead_score: null,
+          qualification_status: null,
+        })
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data as BlandAICall;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bland_ai_calls'] });
@@ -65,15 +81,22 @@ export const useCreateBlandAICall = () => {
 
 export const useUpdateBlandAICall = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<BlandAICall> }) => {
-      const callIndex = mockData.calls.findIndex(call => call.id === id);
-      if (callIndex !== -1) {
-        mockData.calls[callIndex] = { ...mockData.calls[callIndex], ...updates };
-        return mockData.calls[callIndex];
-      }
-      throw new Error('Call not found');
+      if (!user?.id) throw new Error('User not authenticated');
+
+      const { data, error } = await supabase
+        .from('bland_ai_calls')
+        .update({ ...updates, updated_at: new Date().toISOString() })
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data as BlandAICall;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bland_ai_calls'] });
@@ -83,13 +106,19 @@ export const useUpdateBlandAICall = () => {
 
 export const useDeleteBlandAICall = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const callIndex = mockData.calls.findIndex(call => call.id === id);
-      if (callIndex !== -1) {
-        mockData.calls.splice(callIndex, 1);
-      }
+      if (!user?.id) throw new Error('User not authenticated');
+
+      const { error } = await supabase
+        .from('bland_ai_calls')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user.id);
+      
+      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bland_ai_calls'] });
@@ -103,10 +132,20 @@ export const useBlandAICallsSync = () => {
 };
 
 export const useSyncBlandAICalls = () => {
+  const { user } = useAuth();
+  
   return useMutation({
     mutationFn: async () => {
-      // Mock sync - just return success
-      return { synced: mockData.calls.length };
+      if (!user?.id) throw new Error('User not authenticated');
+
+      // This would typically sync with Bland AI API
+      // For now, just return the count of calls
+      const { count } = await supabase
+        .from('bland_ai_calls')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+      
+      return { synced: count || 0 };
     },
   });
 };
@@ -114,29 +153,42 @@ export const useSyncBlandAICalls = () => {
 export const useTriggerAIAnalysis = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { user } = useAuth();
 
   return {
     triggerAnalysis: async (callId: string, transcript: string) => {
-      // Mock AI analysis
-      const callIndex = mockData.calls.findIndex(call => call.id === callId);
-      if (callIndex !== -1) {
-        mockData.calls[callIndex].ai_analysis = {
-          leadScore: Math.floor(Math.random() * 100),
-          qualificationStatus: ['Hot', 'Warm', 'Cold', 'Unqualified'][Math.floor(Math.random() * 4)],
-          sentiment: ['Positive', 'Neutral', 'Negative'][Math.floor(Math.random() * 3)],
-          interestLevel: Math.floor(Math.random() * 10),
-          keyInsights: ['Showed interest in pricing', 'Decision maker confirmed'],
-          nextBestAction: 'Schedule demo',
-          analyzerUsed: 'openai'
-        };
+      if (!user?.id) throw new Error('User not authenticated');
 
-        queryClient.invalidateQueries({ queryKey: ['bland_ai_calls'] });
+      // Mock AI analysis - in real implementation, this would call OpenAI API
+      const mockAnalysis = {
+        leadScore: Math.floor(Math.random() * 100),
+        qualificationStatus: ['Hot', 'Warm', 'Cold', 'Unqualified'][Math.floor(Math.random() * 4)],
+        sentiment: ['Positive', 'Neutral', 'Negative'][Math.floor(Math.random() * 3)],
+        interestLevel: Math.floor(Math.random() * 10),
+        keyInsights: ['Showed interest in pricing', 'Decision maker confirmed'],
+        nextBestAction: 'Schedule demo',
+        analyzerUsed: 'openai'
+      };
 
-        toast({
-          title: 'Analysis Complete',
-          description: 'AI analysis completed successfully',
-        });
-      }
+      const { error } = await supabase
+        .from('bland_ai_calls')
+        .update({
+          ai_analysis: mockAnalysis,
+          lead_score: mockAnalysis.leadScore,
+          qualification_status: mockAnalysis.qualificationStatus,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', callId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      queryClient.invalidateQueries({ queryKey: ['bland_ai_calls'] });
+
+      toast({
+        title: 'Analysis Complete',
+        description: 'AI analysis completed successfully',
+      });
     }
   };
 };

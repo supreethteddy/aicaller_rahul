@@ -473,7 +473,7 @@ function MainContent() {
               }}
               onHoverStart={() => setIsHovering(true)}
               onHoverEnd={() => setIsHovering(false)}
-              onClick={() => navigate("/dashboard")}
+              onClick={() => navigate("/auth")}
             >
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"

@@ -1,13 +1,49 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { mockData } from '@/data/mockData';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const useReportsData = () => {
+  const { user } = useAuth();
+  
   return useQuery({
-    queryKey: ['reports-overview', 'mock-user-123'],
+    queryKey: ['reports-overview', user?.id],
     queryFn: async () => {
-      return mockData.reports;
+      if (!user?.id) throw new Error('User not authenticated');
+
+      // Get leads count
+      const { count: totalLeads } = await supabase
+        .from('leads')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+
+      // Get AI calls count
+      const { count: aiCallsMade } = await supabase
+        .from('bland_ai_calls')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+
+      // Get successful calls count
+      const { count: successfulCalls } = await supabase
+        .from('bland_ai_calls')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('outcome', 'success');
+
+      const successRate = aiCallsMade && aiCallsMade > 0 
+        ? Math.round((successfulCalls || 0) / aiCallsMade * 100 * 10) / 10 
+        : 0;
+
+      // Mock revenue for now - this would need to be calculated from actual data
+      const revenueGenerated = (successfulCalls || 0) * 1000; // Assuming $1000 per successful call
+
+      return {
+        totalLeads: totalLeads || 0,
+        aiCallsMade: aiCallsMade || 0,
+        successRate,
+        revenueGenerated
+      };
     },
-    enabled: true,
+    enabled: !!user?.id,
   });
 };
