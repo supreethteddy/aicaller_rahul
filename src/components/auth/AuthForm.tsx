@@ -43,7 +43,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         {/* Mobile Logo */}
         <div className="lg:hidden text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <h1 className="text-3xl font-bold text-white">AI Caller</h1>
+            <h1 className="text-3xl font-bold text-white">AgenticAI</h1>
           </div>
           <p className="text-slate-300">Your AI Calling Assistant Awaits</p>
         </div>
@@ -52,7 +52,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
           <CardHeader className="text-center">
             <CardTitle className="text-2xl text-white">
               {mode === 'signin' && 'Welcome Back'}
-              {mode === 'signup' && 'Join AI Caller'}
+              {mode === 'signup' && 'Join AgenticAI'}
               {mode === 'forgot' && 'Reset Password'}
             </CardTitle>
             <CardDescription className="text-slate-300">
@@ -145,7 +145,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
                     Forgot your password?
                   </button>
                   <div>
-                    <span className="text-sm text-slate-300">New to AI Caller? </span>
+                    <span className="text-sm text-slate-300">New to AgenticAI? </span>
                     <button
                       type="button"
                       onClick={() => onModeSwitch('signup')}

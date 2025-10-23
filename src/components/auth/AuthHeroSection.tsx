@@ -5,7 +5,7 @@ export const AuthHeroSection: React.FC = () => {
     <div className="flex flex-col justify-center p-12 text-white w-full">
       <div className="max-w-4xl">
         <div className="flex items-center mb-6 justify-center">
-          <h1 className="text-4xl font-bold">AI Caller</h1>
+          <h1 className="text-4xl font-bold">AgenticAI</h1>
         </div>
 
         <h2 className="text-5xl font-bold mb-6 leading-tight">

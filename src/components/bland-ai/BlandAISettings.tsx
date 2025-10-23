@@ -62,13 +62,13 @@ export const BlandAISettings: React.FC = () => {
       setIsConnected(true);
       toast({
         title: "Success",
-        description: "Successfully connected to AI CALLER"
+        description: "Successfully connected to AgenticAI"
       });
     } catch (error: any) {
-      console.error('Error connecting to AI CALLER:', error);
+      console.error('Error connecting to AgenticAI:', error);
       toast({
         title: "Error",
-        description: error?.message || "Failed to connect to AI CALLER. Please check your API key.",
+        description: error?.message || "Failed to connect to AgenticAI. Please check your API key.",
         variant: "destructive"
       });
       setIsConnected(false);
@@ -98,7 +98,7 @@ export const BlandAISettings: React.FC = () => {
                 {isConnected ? (
                   <>
                     <CheckCircle className="w-5 h-5 text-green-600" />
-                    <span className="text-sm font-medium text-green-800">Connected to AI CALLER</span>
+                    <span className="text-sm font-medium text-green-800">Connected to AgenticAI</span>
                   </>
                 ) : (
                   <>
@@ -132,7 +132,7 @@ export const BlandAISettings: React.FC = () => {
               onClick={handleConnect}
               disabled={isLoading}
             >
-              {isLoading ? "Connecting..." : isConnected ? "Update AI CALLER" : "Connect to AI CALLER"}
+              {isLoading ? "Connecting..." : isConnected ? "Update AgenticAI" : "Connect to AgenticAI"}
             </Button>
           </CardContent>
         </Card>
