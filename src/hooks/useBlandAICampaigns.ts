@@ -98,6 +98,16 @@ export const useDeleteBlandAICampaign = () => {
     mutationFn: async (id: string) => {
       if (!user?.id) throw new Error('User not authenticated');
 
+      // First delete all associated calls
+      const { error: callsError } = await supabase
+        .from('bland_ai_calls')
+        .delete()
+        .eq('campaign_id', id)
+        .eq('user_id', user.id);
+      
+      if (callsError) throw callsError;
+
+      // Then delete the campaign
       const { error } = await supabase
         .from('bland_ai_campaigns')
         .delete()
@@ -108,6 +118,7 @@ export const useDeleteBlandAICampaign = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bland_ai_campaigns'] });
+      queryClient.invalidateQueries({ queryKey: ['bland_ai_calls'] });
     },
   });
 };

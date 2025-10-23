@@ -29,23 +29,35 @@ export const UserProfileSettings: React.FC = () => {
 
   const fetchProfile = async () => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user?.id)
-        .single();
+      // Use auth.getUser() to get current user data instead of profiles table
+      const { data: { user: currentUser }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError) throw authError;
 
-      if (error) throw error;
+      if (currentUser) {
+        // Try to get profile data, but don't fail if it doesn't exist
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('full_name, avatar_url')
+          .eq('id', currentUser.id)
+          .single();
 
-      if (data) {
         setProfile({
-          full_name: data.full_name || '',
-          email: data.email || user?.email || '',
-          avatar_url: data.avatar_url || ''
+          full_name: profileData?.full_name || '',
+          email: currentUser.email || '',
+          avatar_url: profileData?.avatar_url || ''
         });
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
+      // Fallback to user data from auth context
+      if (user) {
+        setProfile({
+          full_name: '',
+          email: user.email || '',
+          avatar_url: ''
+        });
+      }
     }
   };
 

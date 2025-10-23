@@ -31,11 +31,11 @@ export const useLeadQualification = (dateRange?: DateRange) => {
       
       if (error) throw error;
 
-      // Calculate qualification stats based on score ranges
-      const hotLeads = leads?.filter(lead => lead.score && lead.score >= 80) || [];
-      const warmLeads = leads?.filter(lead => lead.score && lead.score >= 60 && lead.score < 80) || [];
-      const coldLeads = leads?.filter(lead => lead.score && lead.score >= 40 && lead.score < 60) || [];
-      const unqualifiedLeads = leads?.filter(lead => !lead.score || lead.score < 40) || [];
+      // Calculate qualification stats based on score ranges (matching UI labels)
+      const hotLeads = leads?.filter(lead => lead.score && lead.score >= 71) || [];
+      const warmLeads = leads?.filter(lead => lead.score && lead.score >= 51 && lead.score < 71) || [];
+      const coldLeads = leads?.filter(lead => lead.score && lead.score >= 31 && lead.score < 51) || [];
+      const unqualifiedLeads = leads?.filter(lead => !lead.score || lead.score < 31) || [];
 
       return {
         stats: {
@@ -65,16 +65,16 @@ export const useQualifiedLeadsByStatus = (status: string, dateRange?: DateRange)
         .select('*')
         .eq('user_id', user.id);
 
-      // Filter by status if provided
+      // Filter by status if provided (matching UI score ranges)
       if (status && status !== 'all') {
-        if (status === 'hot') {
-          query = query.gte('score', 80);
-        } else if (status === 'warm') {
-          query = query.gte('score', 60).lt('score', 80);
-        } else if (status === 'cold') {
-          query = query.gte('score', 40).lt('score', 60);
-        } else if (status === 'unqualified') {
-          query = query.or('score.is.null,score.lt.40');
+        if (status === 'Hot') {
+          query = query.gte('score', 71);
+        } else if (status === 'Warm') {
+          query = query.gte('score', 51).lt('score', 71);
+        } else if (status === 'Cold') {
+          query = query.gte('score', 31).lt('score', 51);
+        } else if (status === 'Unqualified') {
+          query = query.or('score.is.null,score.lt.31');
         }
       }
 

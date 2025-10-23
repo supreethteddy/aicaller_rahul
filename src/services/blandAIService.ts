@@ -23,21 +23,21 @@ class BlandAIService {
         if (this.apiKey) return this.apiKey;
 
         try {
-            // Fetch the current user's Bland AI API key from the settings table
+            // Fetch the centralized API key from the settings table
             const { data: settings, error } = await supabase
                 .from('settings')
                 .select('value')
-                .eq('key', 'bland_ai_api_key')
+                .eq('key', 'centralized_ai_api_key')
                 .single();
 
             if (error) throw error;
-            if (!settings?.value) throw new Error('Bland AI API key not found');
+            if (!settings?.value) throw new Error('Centralized API key not found');
 
             this.apiKey = settings.value;
             return this.apiKey;
         } catch (error) {
-            console.error('Error fetching Bland AI API key:', error);
-            throw new Error('Failed to get Bland AI API key. Please check your settings.');
+            console.error('Error fetching centralized API key:', error);
+            throw new Error('Failed to get centralized API key. Please contact administrator.');
         }
     }
 

@@ -19,37 +19,38 @@ export const useRevenueData = () => {
         .eq('outcome', 'success');
 
       // Mock revenue calculation - in real implementation, this would be more sophisticated
-      const revenuePerCall = 1000; // Assuming $1000 per successful call
-      const totalRevenue = (successfulCalls || 0) * revenuePerCall;
+      // Remove mock revenue calculations - show actual data or 0
+      const revenuePerCall = 0; // No mock revenue per call
+      const totalRevenue = 0; // No mock total revenue
 
       return {
         monthlyRevenueData: [
-          { month: 'Jan', total: totalRevenue * 0.1, recurring: totalRevenue * 0.065, one_time: totalRevenue * 0.035, forecast: 0 },
-          { month: 'Feb', total: totalRevenue * 0.15, recurring: totalRevenue * 0.0975, one_time: totalRevenue * 0.0525, forecast: 0 },
-          { month: 'Mar', total: totalRevenue * 0.2, recurring: totalRevenue * 0.13, one_time: totalRevenue * 0.07, forecast: 0 },
-          { month: 'Apr', total: totalRevenue * 0.25, recurring: totalRevenue * 0.1625, one_time: totalRevenue * 0.0875, forecast: 0 },
-          { month: 'May', total: totalRevenue * 0.3, recurring: totalRevenue * 0.195, one_time: totalRevenue * 0.105, forecast: 0 },
-          { month: 'Jun', total: totalRevenue * 0.35, recurring: totalRevenue * 0.2275, one_time: totalRevenue * 0.1225, forecast: totalRevenue * 0.385 }
+          { month: 'Jan', total: 0, recurring: 0, one_time: 0, forecast: 0 },
+          { month: 'Feb', total: 0, recurring: 0, one_time: 0, forecast: 0 },
+          { month: 'Mar', total: 0, recurring: 0, one_time: 0, forecast: 0 },
+          { month: 'Apr', total: 0, recurring: 0, one_time: 0, forecast: 0 },
+          { month: 'May', total: 0, recurring: 0, one_time: 0, forecast: 0 },
+          { month: 'Jun', total: 0, recurring: 0, one_time: 0, forecast: 0 }
         ],
         revenueBySource: [
-          { source: 'Real Estate', revenue: totalRevenue * 0.425, percentage: 42.5, growth: 15.2 },
-          { source: 'Insurance', revenue: totalRevenue * 0.302, percentage: 30.2, growth: 8.7 },
-          { source: 'SaaS', revenue: totalRevenue * 0.175, percentage: 17.5, growth: 22.1 },
-          { source: 'E-commerce', revenue: totalRevenue * 0.099, percentage: 9.9, growth: -2.3 }
+          { source: 'Real Estate', revenue: 0, percentage: 0, growth: 0 },
+          { source: 'Insurance', revenue: 0, percentage: 0, growth: 0 },
+          { source: 'SaaS', revenue: 0, percentage: 0, growth: 0 },
+          { source: 'E-commerce', revenue: 0, percentage: 0, growth: 0 }
         ],
         customerSegmentRevenue: [
-          { segment: 'Enterprise', customers: 12, revenue: totalRevenue * 0.5, avg_value: totalRevenue * 0.5 / 12 },
-          { segment: 'Mid-Market', customers: 28, revenue: totalRevenue * 0.3, avg_value: totalRevenue * 0.3 / 28 },
-          { segment: 'Small Business', customers: 45, revenue: totalRevenue * 0.2, avg_value: totalRevenue * 0.2 / 45 }
+          { segment: 'Enterprise', customers: 0, revenue: 0, avg_value: 0 },
+          { segment: 'Mid-Market', customers: 0, revenue: 0, avg_value: 0 },
+          { segment: 'Small Business', customers: 0, revenue: 0, avg_value: 0 }
         ],
         revenueMetrics: {
-          totalRevenue,
-          monthlyGrowth: 24.4,
-          arrGrowth: 292.8,
-          churnRate: 3.2,
-          avgDealSize: totalRevenue / (successfulCalls || 1),
-          customerLTV: totalRevenue * 0.15,
-          paybackPeriod: 4.2
+          totalRevenue: 0,
+          monthlyGrowth: 0,
+          arrGrowth: 0,
+          churnRate: 0,
+          avgDealSize: 0,
+          customerLTV: 0,
+          paybackPeriod: 0
         }
       };
     },

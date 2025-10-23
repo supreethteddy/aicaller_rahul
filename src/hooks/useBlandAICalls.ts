@@ -126,9 +126,68 @@ export const useDeleteBlandAICall = () => {
   });
 };
 
-// Mock sync function that doesn't do anything
+// Sync function that automatically triggers analysis for completed calls
 export const useBlandAICallsSync = () => {
-  return null;
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const triggerAnalysis = useTriggerAIAnalysis();
+
+  return useQuery({
+    queryKey: ['bland_ai_calls_sync', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+
+      // 1) Poll backend to sync queued/in-progress calls with Bland AI API
+      let synced = 0;
+      try {
+        const { data: syncResult, error: syncError } = await supabase.functions.invoke('sync-bland-calls');
+        if (syncError) {
+          // Non-fatal: continue with analysis even if sync failed
+          console.error('Error syncing Bland AI calls:', syncError);
+        } else if (syncResult && typeof syncResult.synced === 'number') {
+          synced = syncResult.synced;
+        }
+      } catch (err) {
+        console.error('Failed to invoke sync-bland-calls:', err);
+      }
+
+      // 2) Find completed calls with transcripts but no analysis and trigger analysis
+      const { data: callsNeedingAnalysis, error } = await supabase
+        .from('bland_ai_calls')
+        .select('id, transcript')
+        .eq('user_id', user.id)
+        .eq('status', 'completed')
+        .not('transcript', 'is', null)
+        .not('transcript', 'eq', '')
+        .is('ai_analysis', null);
+
+      if (error) {
+        console.error('Error fetching calls needing analysis:', error);
+        return { analyzed: 0, synced };
+      }
+
+      let analyzed = 0;
+      if (callsNeedingAnalysis && callsNeedingAnalysis.length > 0) {
+        for (const call of callsNeedingAnalysis) {
+          try {
+            await triggerAnalysis.triggerAnalysis(call.id, call.transcript);
+            analyzed++;
+          } catch (err) {
+            console.error(`Failed to trigger analysis for call ${call.id}:`, err);
+          }
+        }
+      }
+
+      // Refresh the calls list after sync/analysis
+      queryClient.invalidateQueries({ queryKey: ['bland_ai_calls'] });
+
+      return { analyzed, synced };
+    },
+    enabled: !!user?.id,
+    refetchInterval: 30000, // Check every 30 seconds
+    refetchIntervalInBackground: false,
+    staleTime: 10000,
+  });
 };
 
 export const useSyncBlandAICalls = () => {
@@ -158,37 +217,41 @@ export const useTriggerAIAnalysis = () => {
   return {
     triggerAnalysis: async (callId: string, transcript: string) => {
       if (!user?.id) throw new Error('User not authenticated');
+      
+      // Skip analysis if transcript is empty or null
+      if (!transcript || transcript.trim() === '') {
+        console.log(`Skipping analysis for call ${callId} - no transcript available`);
+        return null;
+      }
 
-      // Mock AI analysis - in real implementation, this would call OpenAI API
-      const mockAnalysis = {
-        leadScore: Math.floor(Math.random() * 100),
-        qualificationStatus: ['Hot', 'Warm', 'Cold', 'Unqualified'][Math.floor(Math.random() * 4)],
-        sentiment: ['Positive', 'Neutral', 'Negative'][Math.floor(Math.random() * 3)],
-        interestLevel: Math.floor(Math.random() * 10),
-        keyInsights: ['Showed interest in pricing', 'Decision maker confirmed'],
-        nextBestAction: 'Schedule demo',
-        analyzerUsed: 'openai'
-      };
+      try {
+        // Call the real analyze-call-transcript edge function
+        const { data, error } = await supabase.functions.invoke('analyze-call-transcript', {
+          body: {
+            callId,
+            transcript
+          }
+        });
 
-      const { error } = await supabase
-        .from('bland_ai_calls')
-        .update({
-          ai_analysis: mockAnalysis,
-          lead_score: mockAnalysis.leadScore,
-          qualification_status: mockAnalysis.qualificationStatus,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', callId)
-        .eq('user_id', user.id);
+        if (error) throw error;
 
-      if (error) throw error;
+        queryClient.invalidateQueries({ queryKey: ['bland_ai_calls'] });
 
-      queryClient.invalidateQueries({ queryKey: ['bland_ai_calls'] });
+        toast({
+          title: 'Analysis Complete',
+          description: 'AI analysis completed successfully',
+        });
 
-      toast({
-        title: 'Analysis Complete',
-        description: 'AI analysis completed successfully',
-      });
+        return data;
+      } catch (error) {
+        console.error('Error triggering AI analysis:', error);
+        toast({
+          title: 'Analysis Failed',
+          description: 'Failed to analyze transcript. Please try again.',
+          variant: 'destructive',
+        });
+        throw error;
+      }
     }
   };
 };

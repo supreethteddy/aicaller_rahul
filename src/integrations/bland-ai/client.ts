@@ -7,16 +7,11 @@ class BlandAIClient {
 
     async getApiKey(): Promise<string | null> {
         try {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) return null;
-
-            // Use user-specific key by appending user ID
-            const userSpecificKey = `bland_ai_api_key_${user.id}`;
-
+            // Use centralized API key for all users
             const { data, error } = await supabase
                 .from('settings')
                 .select('value')
-                .eq('key', userSpecificKey)
+                .eq('key', 'centralized_ai_api_key')
                 .single();
 
             if (error || !data) return null;
@@ -35,35 +30,13 @@ class BlandAIClient {
 
     async saveApiKey(apiKey: string): Promise<boolean> {
         try {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) return false;
-
-            // Use user-specific key by appending user ID
-            const userSpecificKey = `bland_ai_api_key_${user.id}`;
-
-            // First check if the key exists
-            const { data: existingKey } = await supabase
+            // Save centralized API key (only super admins should be able to do this)
+            const { error } = await supabase
                 .from('settings')
-                .select('id')
-                .eq('key', userSpecificKey)
-                .single();
-
-            let error;
-            if (existingKey) {
-                // Update existing key
-                ({ error } = await supabase
-                    .from('settings')
-                    .update({ value: apiKey })
-                    .eq('key', userSpecificKey));
-            } else {
-                // Insert new key
-                ({ error } = await supabase
-                    .from('settings')
-                    .insert([{
-                        key: userSpecificKey,
-                        value: apiKey
-                    }]));
-            }
+                .upsert({
+                    key: 'centralized_ai_api_key',
+                    value: apiKey
+                });
 
             if (error) {
                 console.error('Error saving API key:', error);

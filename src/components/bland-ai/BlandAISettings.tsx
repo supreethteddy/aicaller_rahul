@@ -1,139 +1,40 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Settings, Key, CheckCircle, AlertCircle } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { BlandAIClient } from '@/integrations/bland-ai/client';
+import { CheckCircle, Settings } from 'lucide-react';
+
 export const BlandAISettings: React.FC = () => {
-  const [apiKey, setApiKey] = useState('');
-  const [isConnected, setIsConnected] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const {
-    toast
-  } = useToast();
-  const blandAI = new BlandAIClient();
-  useEffect(() => {
-    checkConnection();
-  }, []);
-  const checkConnection = async () => {
-    try {
-      const existingApiKey = await blandAI.getApiKey();
-      if (existingApiKey) {
-        setApiKey(existingApiKey);
-        blandAI.setApiKey(existingApiKey);
-        const isActive = await blandAI.testConnection();
-        setIsConnected(isActive);
-      }
-    } catch (error) {
-      console.error('Error checking connection:', error);
-      setIsConnected(false);
-    }
-  };
-  const handleConnect = async () => {
-    if (!apiKey.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter an API key",
-        variant: "destructive"
-      });
-      return;
-    }
-    setIsLoading(true);
-    try {
-      // Test the API key first by temporarily setting it
-      const testClient = new BlandAIClient();
-      testClient.setApiKey(apiKey);
-
-      // Test connection with the provided API key
-      const isActive = await testClient.testConnection();
-      if (!isActive) {
-        throw new Error('Bland AI account is not active or API key is invalid');
-      }
-
-      // Only save the API key if the test was successful
-      const saved = await blandAI.saveApiKey(apiKey);
-      if (!saved) {
-        throw new Error('Failed to save API key');
-      }
-      setIsConnected(true);
-      toast({
-        title: "Success",
-        description: "Successfully connected to AgenticAI"
-      });
-    } catch (error: any) {
-      console.error('Error connecting to AgenticAI:', error);
-      toast({
-        title: "Error",
-        description: error?.message || "Failed to connect to AgenticAI. Please check your API key.",
-        variant: "destructive"
-      });
-      setIsConnected(false);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  return <div className="space-y-6">
+  return (
+    <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold">AI Settings</h2>
-        <p className="text-gray-600">Configure your Bland.ai integration and preferences</p>
+        <p className="text-gray-600">Configure your AI calling preferences</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        {/* API Configuration */}
+        {/* Service Status */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <Key className="w-5 h-5" />
-              <span>API Configuration</span>
+              <Settings className="w-5 h-5 text-blue-600" />
+              <span>AI Calling Service</span>
             </CardTitle>
-            <CardDescription>Configure your API key and connection settings</CardDescription>
+            <CardDescription>
+              Your AI calling service is managed centrally by the system administrator.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-orange-50 border border-orange-200 rounded-lg">
-              <div className="flex items-center space-x-2">
-                {isConnected ? (
-                  <>
-                    <CheckCircle className="w-5 h-5 text-green-600" />
-                    <span className="text-sm font-medium text-green-800">Connected to AgenticAI</span>
-                  </>
-                ) : (
-                  <>
-                    <AlertCircle className="w-5 h-5 text-orange-600" />
-                    <span className="text-sm font-medium text-orange-800">
-                      API Key Required
-                    </span>
-                  </>
-                )}
-              </div>
-              <Badge variant={isConnected ? "default" : "secondary"}>
-                {isConnected ? "Connected" : "Not Connected"}
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="w-5 h-5 text-green-500" />
+              <span className="text-sm font-medium">Service Status</span>
+              <Badge variant="secondary" className="bg-green-100 text-green-800">
+                Active
               </Badge>
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="api-key">API Key</Label>
-              <Input
-                id="api-key"
-                type="password"
-                placeholder="Enter your Bland.ai API key"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                disabled={isLoading}
-              />
-              <p className="text-xs text-gray-600">Get your API key from your provider.</p>
+            
+            <div className="text-sm text-gray-600">
+              <p>Your AI calling service is configured and ready to use. You can create campaigns and make calls without any additional setup.</p>
             </div>
-
-            <Button
-              className="w-full"
-              onClick={handleConnect}
-              disabled={isLoading}
-            >
-              {isLoading ? "Connecting..." : isConnected ? "Update AgenticAI" : "Connect to AgenticAI"}
-            </Button>
           </CardContent>
         </Card>
 
@@ -150,69 +51,24 @@ export const BlandAISettings: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="voice">Default Voice</Label>
-              <Select disabled={!isConnected}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a voice" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="maya">Maya (Female, Professional)</SelectItem>
-                  <SelectItem value="ryan">Ryan (Male, Friendly)</SelectItem>
-                  <SelectItem value="alex">Alex (Male, Confident)</SelectItem>
-                  <SelectItem value="sarah">Sarah (Female, Warm)</SelectItem>
-                </SelectContent>
-              </Select>
+              <label className="text-sm font-medium">Default Voice</label>
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <span className="text-sm text-gray-600">Maya (Female, Professional)</span>
+              </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="language">Language</Label>
-              <Select defaultValue="en" disabled={!isConnected}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="en">English</SelectItem>
-                  <SelectItem value="es">Spanish</SelectItem>
-                  <SelectItem value="fr">French</SelectItem>
-                  <SelectItem value="de">German</SelectItem>
-                </SelectContent>
-              </Select>
+              <label className="text-sm font-medium">Language</label>
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <span className="text-sm text-gray-600">English</span>
+              </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="speed">Speaking Speed</Label>
-              <Select defaultValue="normal" disabled={!isConnected}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="slow">Slow</SelectItem>
-                  <SelectItem value="normal">Normal</SelectItem>
-                  <SelectItem value="fast">Fast</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <Button variant="outline" className="w-full" disabled={!isConnected}>
-              Save Voice Settings
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Phone Number Management */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Phone Numbers</CardTitle>
-            <CardDescription>
-              Manage your phone numbers for outbound calls
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-6">
-              <p className="text-gray-600 mb-4">No phone numbers configured</p>
-              <Button variant="outline" disabled={!isConnected}>
-                Add Phone Number
-              </Button>
+              <label className="text-sm font-medium">Speaking Speed</label>
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <span className="text-sm text-gray-600">Normal</span>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -220,34 +76,31 @@ export const BlandAISettings: React.FC = () => {
         {/* Integration Status */}
         <Card>
           <CardHeader>
-            <CardTitle>Integration Status</CardTitle>
+            <CardTitle>Service Status</CardTitle>
             <CardDescription>
-              Current status of your Bland.ai integration
+              Current status of your AI calling integration
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm">API Connection</span>
-                <Badge variant={isConnected ? "default" : "secondary"}>
-                  {isConnected ? "Connected" : "Disconnected"}
+                <span className="text-sm">AI Service</span>
+                <Badge variant="default">
+                  Active
                 </Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm">Phone Numbers</span>
-                <Badge variant="secondary">0 Active</Badge>
+                <span className="text-sm">Call Capacity</span>
+                <Badge variant="secondary">Unlimited</Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm">Credits Remaining</span>
-                <Badge variant="secondary">Unknown</Badge>
+                <span className="text-sm">Voice Options</span>
+                <Badge variant="secondary">Multiple Available</Badge>
               </div>
             </div>
-
-            <Button variant="outline" className="w-full" onClick={checkConnection} disabled={!isConnected || isLoading}>
-              Test Connection
-            </Button>
           </CardContent>
         </Card>
       </div>
-    </div>;
+    </div>
+  );
 };

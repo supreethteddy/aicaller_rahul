@@ -1,52 +1,21 @@
 import React, { useState, lazy, Suspense } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Bot, Phone, Settings, BarChart3, Plus, Loader2 } from 'lucide-react';
+import { Bot, Phone, Settings, BarChart3, Loader2 } from 'lucide-react';
 import { BlandAIDashboard } from './bland-ai/BlandAIDashboard';
 import { BlandAICampaigns } from './bland-ai/BlandAICampaigns';
 // Lazy load the heavy components
 const BlandAICalls = lazy(() => import('./bland-ai/BlandAICalls').then(module => ({ default: module.BlandAICalls })));
 import { BlandAISettings } from './bland-ai/BlandAISettings';
-import { useSetupRequired } from '@/hooks/useSetupRequired';
-import { SetupRequiredNotice } from './dashboard/SetupRequiredNotice';
-import { useContactDialog } from '@/hooks/useContactDialog';
-import { useChatWindow } from '@/hooks/useChatWindow';
 
 export const BlandAI: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const { setupRequired, isLoading } = useSetupRequired();
-  const { openContactDialog } = useContactDialog();
-  const { openChat } = useChatWindow();
-
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
-          <div className="h-32 bg-gray-200 rounded"></div>
-        </div>
-      </div>
-    );
-  }
-
-  if (setupRequired) {
-    return (
-      <div className="max-w-3xl mx-auto mt-8">
-        <SetupRequiredNotice
-          onContactClick={openContactDialog}
-          onChatClick={openChat}
-        />
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">AgenticAI</h1>
+            <h1 className="text-3xl font-bold text-gray-900">AI Calling</h1>
             <p className="text-gray-600">AI-powered phone calls for lead qualification</p>
           </div>
         </div>

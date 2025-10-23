@@ -13,6 +13,7 @@ import { AdminUsersPage } from './AdminUsersPage';
 import { ContactSubmissionsPage } from './ContactSubmissionsPage';
 import { UserActivationTable } from './UserActivationTable';
 import { QuickReanalysisPanel } from './QuickReanalysisPanel';
+import { CentralizedAPIManagement } from './CentralizedAPIManagement';
 import { Users, MessageSquare, Settings } from 'lucide-react';
 
 interface AdminStats {
@@ -148,17 +149,7 @@ export const AdminDashboard: React.FC = () => {
                 </TabsContent>
 
                 <TabsContent value="settings">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>System Settings</CardTitle>
-                            <CardDescription>
-                                Configure system-wide settings and preferences
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-gray-500">System settings will be available here.</p>
-                        </CardContent>
-                    </Card>
+                    <CentralizedAPIManagement />
                 </TabsContent>
             </Tabs>
         </div>

@@ -34,8 +34,8 @@ export const useReportsData = () => {
         ? Math.round((successfulCalls || 0) / aiCallsMade * 100 * 10) / 10 
         : 0;
 
-      // Mock revenue for now - this would need to be calculated from actual data
-      const revenueGenerated = (successfulCalls || 0) * 1000; // Assuming $1000 per successful call
+      // Remove mock revenue - show actual data or 0 if no real revenue tracking
+      const revenueGenerated = 0; // No mock revenue
 
       return {
         totalLeads: totalLeads || 0,
