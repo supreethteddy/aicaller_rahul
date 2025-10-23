@@ -27,7 +27,7 @@ export const CreateCampaignDialog: React.FC<CreateCampaignDialogProps> = ({ open
       name: '',
       description: '',
       ai_prompt: '',
-      voice_id: 'maya', // Default voice
+      voice_id: '', // Will be set when voices load
     }
   });
   const { toast } = useToast();

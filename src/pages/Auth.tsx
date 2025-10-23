@@ -393,7 +393,7 @@ const Auth = () => {
                       onClick={() => switchMode('signup')}
                       className="text-sm text-orange-400 hover:text-orange-300 font-medium transition-colors"
                     >
-                      Start your free trial
+                       Sign up here
                     </button>
                   </div>
                 </>

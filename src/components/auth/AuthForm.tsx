@@ -151,7 +151,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
                       onClick={() => onModeSwitch('signup')}
                       className="text-sm text-cyan-400 hover:text-cyan-300 font-medium transition-colors"
                     >
-                      Start your free trial
+                      Sign up here
                     </button>
                   </div>
                 </>

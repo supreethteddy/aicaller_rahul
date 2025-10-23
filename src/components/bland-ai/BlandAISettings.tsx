@@ -5,39 +5,68 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Settings, Key, CheckCircle, AlertCircle } from 'lucide-react';
+import { Settings, Key, CheckCircle, AlertCircle, Volume2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { BlandAIClient } from '@/integrations/bland-ai/client';
+import { ElevenLabsProvider } from '@/integrations/elevenlabs/client';
+import { Voice } from '@/integrations/voice/Provider';
 export const BlandAISettings: React.FC = () => {
   const [apiKey, setApiKey] = useState('');
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [voices, setVoices] = useState<Voice[]>([]);
+  const [selectedVoice, setSelectedVoice] = useState<string>('');
+  const [loadingVoices, setLoadingVoices] = useState(false);
   const {
     toast
   } = useToast();
   const blandAI = new BlandAIClient();
+  const elevenLabs = new ElevenLabsProvider();
   useEffect(() => {
     checkConnection();
   }, []);
   const checkConnection = async () => {
     try {
-      const existingApiKey = await blandAI.getApiKey();
+      const existingApiKey = await elevenLabs.getApiKey();
       if (existingApiKey) {
         setApiKey(existingApiKey);
-        blandAI.setApiKey(existingApiKey);
-        const isActive = await blandAI.testConnection();
+        elevenLabs.setApiKey(existingApiKey);
+        const isActive = await elevenLabs.testConnection();
         setIsConnected(isActive);
+        if (isActive) {
+          await loadVoices();
+        }
       }
     } catch (error) {
       console.error('Error checking connection:', error);
       setIsConnected(false);
     }
   };
+
+  const loadVoices = async () => {
+    try {
+      setLoadingVoices(true);
+      const voiceList = await elevenLabs.fetchVoices();
+      setVoices(voiceList);
+      if (voiceList.length > 0 && !selectedVoice) {
+        setSelectedVoice(voiceList[0].voice_id);
+      }
+    } catch (error) {
+      console.error('Error loading voices:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load voices. Please check your API key.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingVoices(false);
+    }
+  };
   const handleConnect = async () => {
     if (!apiKey.trim()) {
       toast({
         title: "Error",
-        description: "Please enter an API key",
+        description: "Please enter an ElevenLabs API key",
         variant: "destructive"
       });
       return;
@@ -45,30 +74,31 @@ export const BlandAISettings: React.FC = () => {
     setIsLoading(true);
     try {
       // Test the API key first by temporarily setting it
-      const testClient = new BlandAIClient();
-      testClient.setApiKey(apiKey);
+      const testProvider = new ElevenLabsProvider();
+      testProvider.setApiKey(apiKey);
 
       // Test connection with the provided API key
-      const isActive = await testClient.testConnection();
+      const isActive = await testProvider.testConnection();
       if (!isActive) {
-        throw new Error('Bland AI account is not active or API key is invalid');
+        throw new Error('ElevenLabs account is not active or API key is invalid');
       }
 
       // Only save the API key if the test was successful
-      const saved = await blandAI.saveApiKey(apiKey);
+      const saved = await elevenLabs.saveApiKey(apiKey);
       if (!saved) {
         throw new Error('Failed to save API key');
       }
       setIsConnected(true);
+      await loadVoices();
       toast({
         title: "Success",
-        description: "Successfully connected to AgenticAI"
+        description: "Successfully connected to ElevenLabs"
       });
     } catch (error: any) {
-      console.error('Error connecting to AgenticAI:', error);
+      console.error('Error connecting to ElevenLabs:', error);
       toast({
         title: "Error",
-        description: error?.message || "Failed to connect to AgenticAI. Please check your API key.",
+        description: error?.message || "Failed to connect to ElevenLabs. Please check your API key.",
         variant: "destructive"
       });
       setIsConnected(false);
@@ -78,8 +108,8 @@ export const BlandAISettings: React.FC = () => {
   };
   return <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">AI Settings</h2>
-        <p className="text-gray-600">Configure your Bland.ai integration and preferences</p>
+        <h2 className="text-2xl font-bold">AI Voice Settings</h2>
+        <p className="text-gray-600">Configure your ElevenLabs integration and voice preferences</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -88,9 +118,9 @@ export const BlandAISettings: React.FC = () => {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Key className="w-5 h-5" />
-              <span>API Configuration</span>
+              <span>ElevenLabs API Configuration</span>
             </CardTitle>
-            <CardDescription>Configure your API key and connection settings</CardDescription>
+            <CardDescription>Configure your ElevenLabs API key and connection settings</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between p-3 bg-orange-50 border border-orange-200 rounded-lg">
@@ -98,7 +128,7 @@ export const BlandAISettings: React.FC = () => {
                 {isConnected ? (
                   <>
                     <CheckCircle className="w-5 h-5 text-green-600" />
-                    <span className="text-sm font-medium text-green-800">Connected to AgenticAI</span>
+                    <span className="text-sm font-medium text-green-800">Connected to ElevenLabs</span>
                   </>
                 ) : (
                   <>
@@ -119,12 +149,12 @@ export const BlandAISettings: React.FC = () => {
               <Input
                 id="api-key"
                 type="password"
-                placeholder="Enter your Bland.ai API key"
+                placeholder="Enter your ElevenLabs API key"
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 disabled={isLoading}
               />
-              <p className="text-xs text-gray-600">Get your API key from your provider.</p>
+              <p className="text-xs text-gray-600">Get your API key from <a href="https://elevenlabs.io" target="_blank" rel="noopener noreferrer" className="text-orange-600 hover:underline">ElevenLabs</a>.</p>
             </div>
 
             <Button
@@ -132,7 +162,7 @@ export const BlandAISettings: React.FC = () => {
               onClick={handleConnect}
               disabled={isLoading}
             >
-              {isLoading ? "Connecting..." : isConnected ? "Update AgenticAI" : "Connect to AgenticAI"}
+              {isLoading ? "Connecting..." : isConnected ? "Update ElevenLabs" : "Connect to ElevenLabs"}
             </Button>
           </CardContent>
         </Card>
@@ -141,27 +171,35 @@ export const BlandAISettings: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <Settings className="w-5 h-5" />
-              <span>Default Voice Settings</span>
+              <Volume2 className="w-5 h-5" />
+              <span>ElevenLabs Voice Settings</span>
             </CardTitle>
             <CardDescription>
-              Set default voice and AI behavior for new campaigns
+              Select from your available ElevenLabs voices for campaigns
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="voice">Default Voice</Label>
-              <Select disabled={!isConnected}>
+              <Select 
+                disabled={!isConnected || loadingVoices} 
+                value={selectedVoice} 
+                onValueChange={setSelectedVoice}
+              >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a voice" />
+                  <SelectValue placeholder={loadingVoices ? "Loading voices..." : "Select a voice"} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="maya">Maya (Female, Professional)</SelectItem>
-                  <SelectItem value="ryan">Ryan (Male, Friendly)</SelectItem>
-                  <SelectItem value="alex">Alex (Male, Confident)</SelectItem>
-                  <SelectItem value="sarah">Sarah (Female, Warm)</SelectItem>
+                  {voices.map((voice) => (
+                    <SelectItem key={voice.voice_id} value={voice.voice_id}>
+                      {voice.name} {voice.category ? `(${voice.category})` : ''}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
+              {voices.length === 0 && isConnected && !loadingVoices && (
+                <p className="text-xs text-gray-600">No voices found. Please check your ElevenLabs account.</p>
+              )}
             </div>
 
             <div className="space-y-2">
