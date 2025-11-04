@@ -21,7 +21,15 @@ export default {
 		extend: {
 			fontFamily: {
 				'inter': ['Inter', 'system-ui', 'sans-serif'],
-				'sans': ['Inter', 'system-ui', 'sans-serif'],
+				'sans': ['PP Neue Montreal', 'system-ui', 'sans-serif'],
+			},
+			letterSpacing: {
+				'tightest': '-0.03em',
+				'tighter2': '-0.04em',
+			},
+			lineHeight: {
+				'snug': '1.15',
+				'tight': '1.08',
 			},
 			colors: {
 				border: 'hsl(var(--border))',
@@ -66,12 +74,20 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				neutral: {
+					950: '#0A0A0A',
 				}
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				sm: 'calc(var(--radius) - 4px)',
+				xl: '14px',
+				'2xl': '20px',
+			},
+			boxShadow: {
+				soft: '0 10px 30px rgba(0,0,0,0.08)',
 			},
 			keyframes: {
 				'accordion-down': {
