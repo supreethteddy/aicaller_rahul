@@ -272,6 +272,7 @@ export const BlandAICalls: React.FC = () => {
   }, []);
 
   const isAnalyzing = useCallback((call: BlandAICall) => {
+    // Show analyzing state if call is completed, has transcript, but no analysis yet
     return call.status === 'completed' && call.transcript && !call.ai_analysis;
   }, []);
 
@@ -406,7 +407,7 @@ export const BlandAICalls: React.FC = () => {
             <div className="flex justify-between items-center">
               <div>
                 <CardTitle>Recent Calls</CardTitle>
-                <CardDescription>All AI phone calls made through Bland.ai with automatic lead qualification analysis</CardDescription>
+                <CardDescription>All AI phone calls with automatic lead qualification analysis</CardDescription>
               </div>
               {calls.length > CALLS_PER_PAGE && (
                 <div className="flex items-center space-x-2">

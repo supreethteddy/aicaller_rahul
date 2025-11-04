@@ -55,8 +55,6 @@ export const AIAnalysisDialog: React.FC<AIAnalysisDialogProps> = ({
     }
   }, [analysis]);
 
-  if (!parsedAnalysis) return null;
-
   // Memoized helper functions to prevent recalculation
   const getScoreColor = useCallback((score: number) => {
     if (score >= 71) return 'text-green-600 bg-green-50';
@@ -73,6 +71,9 @@ export const AIAnalysisDialog: React.FC<AIAnalysisDialogProps> = ({
       default: return 'bg-gray-100 text-gray-800';
     }
   }, []);
+
+  // Early return after all hooks are called
+  if (!parsedAnalysis) return null;
 
   return (
     <Dialog open={open} onOpenChange={onClose}>

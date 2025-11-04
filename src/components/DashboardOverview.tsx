@@ -112,34 +112,35 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onQualific
     ['completed', 'success'].includes(call.status)
   ).length;
   const conversionRate = totalCalls ? Math.round((successfulCalls / totalCalls) * 100) : 0;
-  const estimatedRevenue = successfulCalls * 500; // Assume $500 per successful call
+  // Remove mock revenue - show actual data or hide if no real revenue data
+  const estimatedRevenue = 0; // No mock revenue
 
   const mobileStats = [
     {
       title: 'Total Leads',
       value: totalLeads,
-      change: 12,
+      change: 0, // No mock data
       icon: Users,
       color: 'bg-blue-500'
     },
     {
       title: 'AI Calls Made',
       value: totalCalls,
-      change: 8,
+      change: 0, // No mock data
       icon: Phone,
       color: 'bg-green-500'
     },
     {
       title: 'Success Rate',
       value: `${conversionRate}%`,
-      change: 5,
+      change: 0, // No mock data
       icon: Target,
       color: 'bg-purple-500'
     },
     {
       title: 'Revenue',
-      value: `$${estimatedRevenue.toLocaleString()}`,
-      change: 15,
+      value: estimatedRevenue > 0 ? `$${estimatedRevenue.toLocaleString()}` : 'No Data',
+      change: 0, // No mock data
       icon: TrendingUp,
       color: 'bg-orange-500'
     }

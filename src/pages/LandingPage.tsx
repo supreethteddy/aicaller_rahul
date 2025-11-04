@@ -620,8 +620,6 @@ function FlowStepCard({
         transition={{ duration: 0.4, type: "spring", stiffness: 300 }}
         style={{ transformStyle: "preserve-3d" }}
       >
-       
-
         {/* Hexagonal Pattern Overlay */}
         <div
           className="absolute inset-0 opacity-10"
@@ -645,7 +643,7 @@ function FlowStepCard({
             <div className="relative z-10 w-20 h-20 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-700 flex items-center justify-center text-white font-bold text-2xl shadow-2xl shadow-orange-500/50">
               {step}
             </div>
-            
+
             {/* 3D Shadow Layers */}
             <motion.div
               className="absolute inset-0 rounded-2xl bg-orange-600/50 blur-xl"
@@ -659,7 +657,7 @@ function FlowStepCard({
               }
               transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
             />
-            
+
             {/* Floating Particles */}
             {[...Array(3)].map((_, i) => (
               <motion.div
@@ -1102,9 +1100,7 @@ function MainContent() {
                 transition={{ delay: 0.6, duration: 0.5 }}
               >
                 Home
-                <motion.div
-                  className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 group-hover:w-full transition-all duration-300"
-                />
+                <motion.div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 group-hover:w-full transition-all duration-300" />
               </motion.button>
               <motion.button
                 onClick={() => scrollToSection("how-it-works")}
@@ -1114,9 +1110,7 @@ function MainContent() {
                 transition={{ delay: 0.7, duration: 0.5 }}
               >
                 How It Works
-                <motion.div
-                  className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 group-hover:w-full transition-all duration-300"
-                />
+                <motion.div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 group-hover:w-full transition-all duration-300" />
               </motion.button>
               <motion.button
                 onClick={() => scrollToSection("integrations")}
@@ -1126,9 +1120,7 @@ function MainContent() {
                 transition={{ delay: 0.8, duration: 0.5 }}
               >
                 Integrations
-                <motion.div
-                  className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 group-hover:w-full transition-all duration-300"
-                />
+                <motion.div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 group-hover:w-full transition-all duration-300" />
               </motion.button>
               <motion.button
                 onClick={() => scrollToSection("testimonials")}
@@ -1138,9 +1130,7 @@ function MainContent() {
                 transition={{ delay: 0.9, duration: 0.5 }}
               >
                 Success Stories
-                <motion.div
-                  className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 group-hover:w-full transition-all duration-300"
-                />
+                <motion.div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 group-hover:w-full transition-all duration-300" />
               </motion.button>
             </div>
 
@@ -1153,7 +1143,9 @@ function MainContent() {
                 scale: 1.02,
                 boxShadow: "0 4px 12px rgba(249, 115, 22, 0.3)",
               }}
-              onClick={() => navigate("/dashboard")}
+              onHoverStart={() => setIsHovering(true)}
+              onHoverEnd={() => setIsHovering(false)}
+              onClick={() => navigate("/auth")}
             >
               Get Started
             </motion.button>
@@ -1758,9 +1750,18 @@ function MainContent() {
             </motion.aside>
 
             {/* Right Content Area - Integrations Grid */}
-            <div className="flex-1">
+            <motion.div
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{
+                delay: 0.5,
+                duration: 0.5,
+              }}
+              className="flex-1"
+            >
               <IntegrationGrid selectedCategory={selectedCategory} />
-            </div>
+            </motion.div>
           </div>
         </div>
       </motion.section>
@@ -1777,7 +1778,10 @@ function MainContent() {
         {/* Animated background effects */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+          <div
+            className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"
+            style={{ animationDelay: "1s" }}
+          />
         </div>
 
         <div className="max-w-6xl mx-auto relative">
@@ -1816,7 +1820,13 @@ function MainContent() {
               style={{ height: "600px" }}
             >
               <defs>
-                <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <linearGradient
+                  id="flowGradient"
+                  x1="0%"
+                  y1="0%"
+                  x2="100%"
+                  y2="100%"
+                >
                   <stop offset="0%" stopColor="#f97316" stopOpacity="0.6" />
                   <stop offset="50%" stopColor="#ea580c" stopOpacity="0.8" />
                   <stop offset="100%" stopColor="#f97316" stopOpacity="0.6" />
@@ -1829,7 +1839,7 @@ function MainContent() {
                   </feMerge>
                 </filter>
               </defs>
-              
+
               {/* Wave Path */}
               <motion.path
                 d="M 50 300 Q 300 200, 550 300 T 1050 300 T 1550 300"
@@ -1843,7 +1853,7 @@ function MainContent() {
                 viewport={{ once: true }}
                 transition={{ duration: 2, ease: "easeInOut" }}
               />
-              
+
               {/* Animated Particles along path */}
               {[0, 1, 2, 3].map((i) => (
                 <motion.circle
@@ -1860,7 +1870,8 @@ function MainContent() {
                     delay: i * 0.5,
                   }}
                   style={{
-                    offsetPath: "path('M 50 300 Q 300 200, 550 300 T 1050 300 T 1550 300')",
+                    offsetPath:
+                      "path('M 50 300 Q 300 200, 550 300 T 1050 300 T 1550 300')",
                   }}
                 />
               ))}
@@ -1872,25 +1883,29 @@ function MainContent() {
                 {
                   step: 1,
                   title: "Integrate & Launch",
-                  description: "50+ plug-and-play integrations with ERP, CRM, support, and commerce.",
+                  description:
+                    "50+ plug-and-play integrations with ERP, CRM, support, and commerce.",
                   icon: "🔌",
                 },
                 {
                   step: 2,
                   title: "Configure Logic in Natural Language",
-                  description: "Business users can define workflows. Technical teams maintain guardrails + code control.",
+                  description:
+                    "Business users can define workflows. Technical teams maintain guardrails + code control.",
                   icon: "⚙️",
                 },
                 {
                   step: 3,
                   title: "Observe & Optimize",
-                  description: "Pre-launch testing, live audits, AI-powered insights, and Watchtower observability.",
+                  description:
+                    "Pre-launch testing, live audits, AI-powered insights, and Watchtower observability.",
                   icon: "📊",
                 },
                 {
                   step: 4,
                   title: "Scale & Evolve",
-                  description: "From pilot to millions of concurrent interactions across chat, email, and voice.",
+                  description:
+                    "From pilot to millions of concurrent interactions across chat, email, and voice.",
                   icon: "🚀",
                 },
               ].map((item, index) => (
@@ -2013,7 +2028,10 @@ function MainContent() {
 
                     <div className="flex mb-4 flex-wrap">
                       {[...Array(testimonial.rating)].map((_, i) => (
-                        <span key={i} className="text-yellow-400 text-base md:text-xl">
+                        <span
+                          key={i}
+                          className="text-yellow-400 text-base md:text-xl"
+                        >
                           ⭐
                         </span>
                       ))}

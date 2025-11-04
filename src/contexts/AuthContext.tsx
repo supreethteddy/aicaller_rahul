@@ -1,26 +1,10 @@
-import React, { createContext, useContext, useState } from 'react';
-
-// Mock user data
-const MOCK_USER = {
-  id: 'mock-user-123',
-  email: 'test@test.com',
-  created_at: '2024-01-01T00:00:00Z',
-  user_metadata: {
-    full_name: 'Test User',
-    super_admin: false
-  }
-};
-
-const MOCK_SESSION = {
-  user: MOCK_USER,
-  access_token: 'mock-token',
-  expires_at: Date.now() + 86400000, // 24 hours from now
-  refresh_token: 'mock-refresh-token'
-};
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import type { User, Session } from '@supabase/supabase-js';
 
 interface AuthContextType {
-  user: any | null;
-  session: any | null;
+  user: User | null;
+  session: Session | null;
   loading: boolean;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
@@ -39,41 +23,114 @@ export const useAuth = () => {
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState(MOCK_USER);
-  const [session, setSession] = useState(MOCK_SESSION);
-  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Get initial session
+    const getInitialSession = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error('Error getting session:', error);
+      } else {
+        setSession(session);
+        setUser(session?.user ?? null);
+      }
+      setLoading(false);
+    };
+
+    getInitialSession();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    // Static signup - only allow test@test.com with 12test@
-    if (email === 'test@test.com' && password === '12test@') {
-      setUser(MOCK_USER);
-      setSession(MOCK_SESSION);
+    try {
+      setLoading(true);
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+          },
+        },
+      });
+
+      if (error) {
+        return { error };
+      }
+
       return { error: null };
-    } else {
-      return { error: { message: 'Invalid credentials. Use test@test.com and 12test@' } };
+    } catch (error) {
+      return { error };
+    } finally {
+      setLoading(false);
     }
   };
 
   const signIn = async (email: string, password: string) => {
-    // Static signin - only allow test@test.com with 12test@
-    if (email === 'test@test.com' && password === '12test@') {
-      setUser(MOCK_USER);
-      setSession(MOCK_SESSION);
+    try {
+      setLoading(true);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        return { error };
+      }
+
       return { error: null };
-    } else {
-      return { error: { message: 'Invalid credentials. Use test@test.com and 12test@' } };
+    } catch (error) {
+      return { error };
+    } finally {
+      setLoading(false);
     }
   };
 
   const signOut = async () => {
-    setUser(null);
-    setSession(null);
-    window.location.href = '/';
-    return { error: null };
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        return { error };
+      }
+      return { error: null };
+    } catch (error) {
+      return { error };
+    } finally {
+      setLoading(false);
+    }
   };
 
   const resetPassword = async (email: string) => {
-    return { error: null };
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth?mode=reset-password`,
+      });
+
+      if (error) {
+        return { error };
+      }
+
+      return { error: null };
+    } catch (error) {
+      return { error };
+    } finally {
+      setLoading(false);
+    }
   };
 
   const value = {
