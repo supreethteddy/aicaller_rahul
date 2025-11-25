@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { FiMail, FiPhoneCall } from "react-icons/fi";
+import { FaLinkedinIn, FaTwitter } from "react-icons/fa";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import DarkVeil from "@/components/ui/DarkVeil";
@@ -51,10 +53,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-black overflow-hidden relative">
       <AnimatePresence mode="wait">
-        {!showMainContent && (
-          <LoadingSequence key="loading" stage={loadingStage} />
-        )}
-        {showMainContent && <MainContent key="main" />}
+        <MainContent key="main" />
       </AnimatePresence>
     </div>
   );
@@ -533,7 +532,7 @@ function IntegrationCategoryTab({
   isActive,
   onClick,
 }: {
-  category: { id: string; label: string; icon: string };
+  category: { id: string; label: string };
   index: number;
   isActive: boolean;
   onClick: () => void;
@@ -570,7 +569,6 @@ function IntegrationCategoryTab({
           transition={{ duration: 0.2 }}
         />
       )}
-      <span className="text-base">{category.icon}</span>
       <span className="font-medium text-sm whitespace-nowrap">
         {category.label}
       </span>
@@ -583,13 +581,11 @@ function FlowStepCard({
   step,
   title,
   description,
-  icon,
   index,
 }: {
   step: number;
   title: string;
   description: string;
-  icon: string;
   index: number;
 }) {
   const [isHovered, setIsHovered] = useState(false);
@@ -692,23 +688,6 @@ function FlowStepCard({
                 }}
               />
             ))}
-          </motion.div>
-
-          {/* Icon with 3D Rotation */}
-          <motion.div
-            className="text-5xl"
-            animate={
-              isHovered
-                ? {
-                    rotateY: [0, 180, 360],
-                    rotateZ: [0, 10, -10, 0],
-                  }
-                : {}
-            }
-            transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
-            style={{ transformStyle: "preserve-3d" }}
-          >
-            {icon}
           </motion.div>
         </div>
 
@@ -907,6 +886,7 @@ function MainContent() {
   const [selectedCategory, setSelectedCategory] = useState("erp");
   const [currentSlide, setCurrentSlide] = useState(0);
   const [loaded, setLoaded] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   // Testimonials data
@@ -916,7 +896,7 @@ function MainContent() {
       role: "Sales Director",
       company: "TechCorp Solutions",
       content:
-        "AgenticAI has revolutionized our sales process. We've seen a 300% increase in lead qualification rates, and the AI agents never miss a follow-up. The conversation flow is so seamless that prospects genuinely believe they're speaking with a human. Our team now focuses on high-value closing while AgenticAI handles outreach.",
+        "Echosphere has revolutionized our sales process. We've seen a 300% increase in lead qualification rates, and the AI agents never miss a follow-up. The conversation flow is so seamless that prospects genuinely believe they're speaking with a human. Our team now focuses on high-value closing while Echosphere handles outreach.",
       rating: 5,
       initials: "MT",
     },
@@ -943,7 +923,7 @@ function MainContent() {
       role: "Marketing Director",
       company: "Digital Dynamics",
       content:
-        "The CRM integration was seamless. Our conversion rates have improved dramatically since implementing AgenticAI. The AI syncs conversation data, handles lead scoring automatically, and provides actionable insights. We're seeing a 250% increase in qualified leads.",
+        "The CRM integration was seamless. Our conversion rates have improved dramatically since implementing Echosphere. The AI syncs conversation data, handles lead scoring automatically, and provides actionable insights. We're seeing a 250% increase in qualified leads.",
       rating: 5,
       initials: "OM",
     },
@@ -952,10 +932,25 @@ function MainContent() {
       role: "Business Development Manager",
       company: "ScaleUp Ventures",
       content:
-        "AgenticAI has transformed our sales process. We're closing deals faster, our pipeline is more qualified, and our team has more time for strategic conversations. The AI handles outreach and qualification with precision matching our best sales reps.",
+        "Echosphere has transformed our sales process. We're closing deals faster, our pipeline is more qualified, and our team has more time for strategic conversations. The AI handles outreach and qualification with precision matching our best sales reps.",
       rating: 5,
       initials: "RC",
     },
+  ];
+
+  const socialLinks = [
+    { label: "Email us", icon: FiMail, url: "mailto:hello@echosphere.ai" },
+    {
+      label: "Follow on Twitter",
+      icon: FaTwitter,
+      url: "https://twitter.com/echosphere",
+    },
+    {
+      label: "Connect on LinkedIn",
+      icon: FaLinkedinIn,
+      url: "https://www.linkedin.com/company/echosphere",
+    },
+    { label: "Call sales", icon: FiPhoneCall, url: "tel:+1234567890" },
   ];
 
   // Keen Slider setup with auto-play
@@ -1021,6 +1016,11 @@ function MainContent() {
     }
   };
 
+  const handleMobileNav = (sectionId: string) => {
+    scrollToSection(sectionId);
+    setIsMobileMenuOpen(false);
+  };
+
   // Scroll to top function
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1079,14 +1079,17 @@ function MainContent() {
       >
         <div className="flex justify-between items-center max-w-7xl mx-auto">
           <motion.div
-            className="text-white font-medium text-xl md:text-2xl tracking-tight"
+            className=""
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4, duration: 0.6 }}
             whileHover={{ scale: 1.02 }}
           >
-            <span>Agentic</span>
-            <span className="text-orange-400">AI</span>
+            <img
+              src="/logo-dark-theme.png"
+              alt="Echosphere Logo"
+              className="w-[4rem] object-contain sm:scale-125"
+            />
           </motion.div>
 
           <div className="flex items-center gap-6 md:gap-8">
@@ -1135,7 +1138,7 @@ function MainContent() {
             </div>
 
             <motion.button
-              className="px-5 py-2.5 md:px-6 md:py-3 bg-orange-500 text-white rounded-xl font-medium hover:bg-orange-600 transition-all text-sm md:text-base"
+              className="px-5 py-2.5 md:px-6 md:py-3 bg-orange-500 text-white rounded-xl font-medium hover:bg-orange-600 transition-all text-sm hidden md:inline-block"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 1.0, duration: 0.5 }}
@@ -1149,9 +1152,89 @@ function MainContent() {
             >
               Get Started
             </motion.button>
+            <motion.button
+              className="md:hidden text-white focus:outline-none"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 1.1, duration: 0.4 }}
+              onClick={() => setIsMobileMenuOpen(true)}
+              aria-label="Open navigation menu"
+            >
+              <div className="space-y-1.5">
+                <span className="block h-0.5 w-6 bg-white rounded-full" />
+                <span className="block h-0.5 w-6 bg-white rounded-full" />
+                <span className="block h-0.5 w-6 bg-white rounded-full" />
+              </div>
+            </motion.button>
           </div>
         </div>
       </motion.nav>
+
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <>
+            <motion.div
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 md:hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+            <motion.div
+              className="fixed top-0 right-0 h-full w-4/5 max-w-xs bg-[#0f0f0f] border-l border-gray-800 z-50 md:hidden p-6 flex flex-col"
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", stiffness: 260, damping: 30 }}
+            >
+              <div className="flex items-center justify-end">
+                <button
+                  className="text-gray-400 hover:text-white transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  aria-label="Close navigation menu"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="mt-10 flex flex-col gap-5">
+                <button
+                  className="text-left text-white text-lg font-medium"
+                  onClick={() => handleMobileNav("hero")}
+                >
+                  Home
+                </button>
+                <button
+                  className="text-left text-white text-lg font-medium"
+                  onClick={() => handleMobileNav("how-it-works")}
+                >
+                  How It Works
+                </button>
+                <button
+                  className="text-left text-white text-lg font-medium"
+                  onClick={() => handleMobileNav("integrations")}
+                >
+                  Integrations
+                </button>
+                <button
+                  className="text-left text-white text-lg font-medium"
+                  onClick={() => handleMobileNav("testimonials")}
+                >
+                  Success Stories
+                </button>
+                <button
+                  className="text-left text-white text-lg font-medium"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    navigate("/auth");
+                  }}
+                >
+                  Get Started
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       <div
         id="hero"
@@ -1311,101 +1394,6 @@ function MainContent() {
       {/* Spacer between hero and trust */}
       <div className="h-24"></div>
 
-      {/* Trust Section */}
-      {/* <motion.section
-        className="relative z-10 py-32 px-6"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.8 }}
-      >
-        <div className="max-w-7xl mx-auto text-center">
-          <motion.h2
-            className="text-lg md:text-xl text-gray-400 mb-16"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2, duration: 0.6 }}
-          >
-            Over 50+ business trust us
-          </motion.h2>
-
-
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-8 md:gap-12 items-center justify-items-center">
-            {[
-              { icon: "💬", name: "Logoipsum" },
-              { icon: "📊", name: "Logoipsum" },
-              { icon: "⭐", name: "Logoipsum" },
-              { icon: "🛡️", name: "Logoipsum" },
-              { icon: "🔧", name: "Logoipsum" },
-            ].map((company, index) => (
-              <motion.div
-                key={index}
-                className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors group cursor-pointer"
-                initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.4 + index * 0.1, duration: 0.5 }}
-                whileHover={{
-                  scale: 1.05,
-                  y: -2,
-                }}
-                onHoverStart={() => setIsHovering(true)}
-                onHoverEnd={() => setIsHovering(false)}
-              >
-                <motion.div
-                  className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center text-lg group-hover:bg-orange-600/20 transition-colors"
-                  whileHover={{ rotate: 5 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {company.icon}
-                </motion.div>
-                <motion.span
-                  className="font-medium text-sm md:text-base"
-                  animate={{
-                    textShadow: [
-                      "0 0 0px rgba(251, 146, 60, 0)",
-                      "0 0 8px rgba(251, 146, 60, 0.3)",
-                      "0 0 0px rgba(251, 146, 60, 0)",
-                    ],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Number.POSITIVE_INFINITY,
-                    delay: index * 0.5,
-                  }}
-                >
-                  {company.name}
-                </motion.span>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-
-        {[...Array(6)].map((_, i) => (
-          <motion.div
-            key={`trust-particle-${i}`}
-            className="absolute w-1 h-1 bg-orange-400/20 rounded-full"
-            style={{
-              left: `${15 + i * 15}%`,
-              top: `${20 + (i % 2) * 60}%`,
-            }}
-            animate={{
-              opacity: [0, 0.6, 0],
-              scale: [0, 1, 0],
-              y: [0, -30, 0],
-            }}
-            transition={{
-              duration: 4 + i * 0.5,
-              repeat: Number.POSITIVE_INFINITY,
-              delay: i * 0.8,
-              ease: "easeInOut",
-            }}
-          />
-        ))}
-      </motion.section> */}
-
       {/* Services Section */}
       <motion.section
         id="services"
@@ -1416,38 +1404,6 @@ function MainContent() {
         transition={{ duration: 1 }}
       >
         <div className="max-w-6xl mx-auto text-center">
-          {/* Services Badge */}
-          {/* <motion.div
-            className="inline-flex items-center px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-full mb-8"
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2, duration: 0.6 }}
-            whileHover={{
-              scale: 1.05,
-              borderColor: "rgb(249 115 22)",
-              backgroundColor: "rgba(249, 115, 22, 0.1)",
-            }}
-          >
-            <motion.span
-              className="text-gray-300 text-sm font-medium"
-              animate={{
-                color: [
-                  "rgb(209 213 219)",
-                  "rgb(251 146 60)",
-                  "rgb(209 213 219)",
-                ],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Number.POSITIVE_INFINITY,
-                ease: "easeInOut",
-              }}
-            >
-              Our Services
-            </motion.span>
-          </motion.div> */}
-
           {/* Main Heading */}
           <motion.h2
             className="text-4xl md:text-6xl lg:text-7xl font-medium text-white mb-8 leading-tight tracking-tightest"
@@ -1581,37 +1537,31 @@ function MainContent() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
-                icon: "🤖",
                 title: "Smart Lead Qualification",
                 description:
                   "AI analyzes and scores leads automatically, identifying the most promising prospects for your sales team.",
               },
               {
-                icon: "📞",
                 title: "Automated Calling",
                 description:
                   "Make hundreds of calls simultaneously with natural-sounding AI voices that engage prospects effectively.",
               },
               {
-                icon: "📊",
                 title: "Real-time Analytics",
                 description:
                   "Get instant insights on call performance, conversion rates, and lead quality with detailed dashboards.",
               },
               {
-                icon: "🎯",
                 title: "Personalized Scripts",
                 description:
                   "Dynamic conversation flows that adapt based on prospect responses and company data.",
               },
               {
-                icon: "🔄",
                 title: "CRM Integration",
                 description:
                   "Seamlessly sync with your existing CRM systems for unified lead management and tracking.",
               },
               {
-                icon: "⚡",
                 title: "Instant Follow-ups",
                 description:
                   "Automated follow-up sequences that nurture leads and schedule meetings without manual intervention.",
@@ -1633,14 +1583,6 @@ function MainContent() {
                 onHoverEnd={() => setIsHovering(false)}
               >
                 <motion.div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                <motion.div
-                  className="text-4xl mb-4"
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {feature.icon}
-                </motion.div>
 
                 <h3 className="text-xl font-medium text-white mb-3 group-hover:text-orange-300 transition-colors">
                   {feature.title}
@@ -1730,12 +1672,12 @@ function MainContent() {
 
                 <nav className="flex flex-wrap lg:flex-col gap-2 lg:gap-0 lg:space-y-0.5">
                   {[
-                    { id: "erp", label: "ERP & Finance", icon: "💼" },
-                    { id: "crm", label: "CRM & Sales", icon: "🎯" },
-                    { id: "support", label: "Support", icon: "🎧" },
-                    { id: "productivity", label: "Productivity", icon: "📧" },
-                    { id: "scheduling", label: "Scheduling", icon: "📅" },
-                    { id: "commerce", label: "Commerce", icon: "🛒" },
+                    { id: "erp", label: "ERP & Finance" },
+                    { id: "crm", label: "CRM & Sales" },
+                    { id: "support", label: "Support" },
+                    { id: "productivity", label: "Productivity" },
+                    { id: "scheduling", label: "Scheduling" },
+                    { id: "commerce", label: "Commerce" },
                   ].map((category, index) => (
                     <IntegrationCategoryTab
                       key={category.id}
@@ -1885,28 +1827,24 @@ function MainContent() {
                   title: "Integrate & Launch",
                   description:
                     "50+ plug-and-play integrations with ERP, CRM, support, and commerce.",
-                  icon: "🔌",
                 },
                 {
                   step: 2,
                   title: "Configure Logic in Natural Language",
                   description:
                     "Business users can define workflows. Technical teams maintain guardrails + code control.",
-                  icon: "⚙️",
                 },
                 {
                   step: 3,
                   title: "Observe & Optimize",
                   description:
                     "Pre-launch testing, live audits, AI-powered insights, and Watchtower observability.",
-                  icon: "📊",
                 },
                 {
                   step: 4,
                   title: "Scale & Evolve",
                   description:
                     "From pilot to millions of concurrent interactions across chat, email, and voice.",
-                  icon: "🚀",
                 },
               ].map((item, index) => (
                 <FlowStepCard
@@ -1914,7 +1852,6 @@ function MainContent() {
                   step={item.step}
                   title={item.title}
                   description={item.description}
-                  icon={item.icon}
                   index={index}
                 />
               ))}
@@ -1961,16 +1898,16 @@ function MainContent() {
 
           {/* Trusted by Section */}
           <motion.div
-            className="mb-8 md:mb-12"
+            className="mb-8 hidden md:block"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.6, duration: 0.6 }}
           >
-            <h3 className="text-xl md:text-2xl font-medium text-white text-center mb-6 md:mb-8">
+            <h3 className="text-2xl font-medium text-white text-center mb-8">
               Trusted by:
             </h3>
-            <div className="flex justify-center items-center gap-3 md:gap-4 flex-wrap px-4">
+            <div className="flex justify-center items-center gap-4 flex-wrap px-4">
               {testimonials.map((testimonial, index) => (
                 <button
                   key={index}
@@ -1984,7 +1921,7 @@ function MainContent() {
                   }`}
                 >
                   <div
-                    className={`w-12 h-12 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-700 flex items-center justify-center text-white font-medium text-sm md:text-lg border-2 transition-all duration-300 ${
+                    className={`w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-700 flex items-center justify-center text-white font-medium text-lg border-2 transition-all duration-300 ${
                       currentSlide === index
                         ? "border-orange-500 shadow-lg shadow-orange-500/50"
                         : "border-gray-700 hover:border-orange-400/50"
@@ -1994,7 +1931,7 @@ function MainContent() {
                   </div>
                   {currentSlide === index && (
                     <motion.div
-                      className="absolute -bottom-6 md:-bottom-8 left-1/2 transform -translate-x-1/2 bg-black/90 px-2 md:px-3 py-1 rounded text-white text-[10px] md:text-xs font-medium whitespace-nowrap"
+                      className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-black/90 px-3 py-1 rounded text-white text-[10px] text-xs font-medium whitespace-nowrap"
                       initial={{ opacity: 0, y: -5 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.2 }}
@@ -2058,54 +1995,6 @@ function MainContent() {
                 </div>
               ))}
             </div>
-
-            {/* Navigation Arrows */}
-            {/* {loaded && instanceRef.current && (
-              <>
-                <button
-                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                    e.stopPropagation();
-                    instanceRef.current?.prev();
-                  }}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-12 h-12 rounded-full bg-gray-900/80 border border-gray-700 flex items-center justify-center text-white transition-all duration-300 hover:bg-gray-800 hover:border-orange-500/50"
-                >
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 19l-7-7 7-7"
-                    />
-                  </svg>
-                </button>
-                <button
-                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                    e.stopPropagation();
-                    instanceRef.current?.next();
-                  }}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-12 h-12 rounded-full bg-gray-900/80 border border-gray-700 flex items-center justify-center text-white transition-all duration-300 hover:bg-gray-800 hover:border-orange-500/50"
-                >
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </button>
-              </>
-            )} */}
           </div>
         </div>
       </motion.section>
@@ -2351,7 +2240,7 @@ function MainContent() {
               viewport={{ once: true }}
               transition={{ delay: 0.6, duration: 0.6 }}
             >
-              Let's discuss how AgenticAI can transform your sales process
+              Let's discuss how Echosphere can transform your sales process
             </motion.p>
           </div>
 
@@ -2487,36 +2376,40 @@ function MainContent() {
               transition={{ delay: 0.2, duration: 0.6 }}
             >
               <div className="text-white font-medium text-2xl mb-4">
-                <span>Agentic</span>
-                <span className="text-orange-400">AI</span>
+                <img
+                  src="/logo-dark-theme.png"
+                  alt="Echosphere Logo"
+                  className="w-[8rem] object-contain"
+                />
               </div>
               <p className="text-gray-400 mb-6">
                 Transforming sales with intelligent AI calling assistants that
                 work 24/7.
               </p>
               <div className="flex space-x-4">
-                {["📧", "🐦", "💼", "📱"].map((icon, index) => (
+                {socialLinks.map(({ label, icon: Icon, url }, index) => (
                   <motion.a
                     key={index}
-                    href="#"
+                    href={url}
+                    target={url.startsWith("http") ? "_blank" : undefined}
+                    rel={url.startsWith("http") ? "noreferrer" : undefined}
                     className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 hover:bg-orange-600 hover:text-white transition-colors"
                     whileHover={{ scale: 1.1, y: -2 }}
                     whileTap={{ scale: 0.95 }}
+                    aria-label={label}
                   >
-                    {icon}
+                    <Icon className="w-5 h-5" />
                   </motion.a>
                 ))}
               </div>
             </motion.div>
 
+            {/* Existing website links retained for reference
             {[
               {
                 title: "Product",
                 links: [
-                  {
-                    name: "Features",
-                    action: () => scrollToSection("features"),
-                  },
+                  { name: "Features", action: () => scrollToSection("features") },
                   { name: "Pricing", action: () => scrollToSection("pricing") },
                   { name: "API", action: () => navigate("/auth") },
                   { name: "Documentation", action: () => navigate("/auth") },
@@ -2538,6 +2431,54 @@ function MainContent() {
                   { name: "Community", action: () => navigate("/auth") },
                   { name: "Status", action: () => navigate("/auth") },
                   { name: "Security", action: () => navigate("/auth") },
+                ],
+              },
+            ].map((section) => (...))}
+            */}
+            {[
+              {
+                title: "Navigate",
+                links: [
+                  { name: "Home", action: () => scrollToSection("hero") },
+                  {
+                    name: "How It Works",
+                    action: () => scrollToSection("how-it-works"),
+                  },
+                  {
+                    name: "Integrations",
+                    action: () => scrollToSection("integrations"),
+                  },
+                  {
+                    name: "Success Stories",
+                    action: () => scrollToSection("testimonials"),
+                  },
+                ],
+              },
+              {
+                title: "Product",
+                links: [
+                  {
+                    name: "Features",
+                    action: () => scrollToSection("features"),
+                  },
+                  { name: "Pricing", action: () => scrollToSection("pricing") },
+                  { name: "Contact", action: () => scrollToSection("contact") },
+                  {
+                    name: "Services",
+                    action: () => scrollToSection("services"),
+                  },
+                ],
+              },
+              {
+                title: "Resources",
+                links: [
+                  { name: "Hero", action: () => scrollToSection("hero") },
+                  {
+                    name: "Testimonials",
+                    action: () => scrollToSection("testimonials"),
+                  },
+                  { name: "Pricing", action: () => scrollToSection("pricing") },
+                  { name: "Contact", action: () => scrollToSection("contact") },
                 ],
               },
             ].map((section, sectionIndex) => (
@@ -2575,25 +2516,17 @@ function MainContent() {
             transition={{ delay: 0.8, duration: 0.6 }}
           >
             <p className="text-gray-400 mb-4 md:mb-0">
-              © 2024 AgenticAI. All rights reserved.
+              © {new Date().getFullYear()} Echosphere. All rights reserved.
             </p>
+            {/* Existing legal links retained for future use
             <div className="flex space-x-6">
               {[
                 { name: "Privacy Policy", action: () => navigate("/auth") },
                 { name: "Terms of Service", action: () => navigate("/auth") },
                 { name: "Cookie Policy", action: () => navigate("/auth") },
-              ].map((link, index) => (
-                <motion.button
-                  key={index}
-                  className="text-gray-400 hover:text-white transition-colors text-sm"
-                  whileHover={{ y: -2 }}
-                  transition={{ duration: 0.2 }}
-                  onClick={link.action}
-                >
-                  {link.name}
-                </motion.button>
-              ))}
+              ].map((link) => (...))}
             </div>
+            */}
           </motion.div>
         </div>
       </motion.footer>

@@ -14,7 +14,7 @@ All API key configuration and third-party branding has been removed from the use
 
 ### 2. **Updated Application Title**
 - **File**: `src/components/BlandAI.tsx`
-- Changed from "AgenticAI" to "AI Calling"
+- Changed from "Echosphere" to "AI Calling"
 - More generic, no third-party branding
 
 ### 3. **Simplified Settings Page**

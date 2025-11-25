@@ -70,7 +70,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({ activeTab, onTabCh
         <div className="flex flex-col h-full bg-slate-900 text-white">
           {/* Header */}
           <div className="p-6 border-b border-slate-700">
-            <h1 className="text-xl font-bold text-center">AgenticAI</h1>
+            <h1 className="text-xl font-bold text-center">Echosphere</h1>
             <p className="text-slate-400 text-sm mt-1 text-center">AI Calling Assistant</p>
           </div>
 

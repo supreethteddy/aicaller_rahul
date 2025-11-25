@@ -1,22 +1,21 @@
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useToast } from "@/hooks/use-toast";
 
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { ArrowLeft, Loader2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useToast } from '@/hooks/use-toast';
-
-type AuthMode = 'signin' | 'signup' | 'forgot';
+type AuthMode = "signin" | "signup" | "forgot";
 
 const Auth = () => {
-  const [mode, setMode] = useState<AuthMode>('signin');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [fullName, setFullName] = useState('');
+  const [mode, setMode] = useState<AuthMode>("signin");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [fullName, setFullName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
@@ -27,7 +26,7 @@ const Auth = () => {
 
   useEffect(() => {
     if (user) {
-      navigate('/dashboard');
+      navigate("/dashboard");
     }
   }, [user, navigate]);
 
@@ -36,21 +35,21 @@ const Auth = () => {
       setMousePosition({ x: e.clientX, y: e.clientY });
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     try {
-      if (mode === 'signup') {
+      if (mode === "signup") {
         if (password !== confirmPassword) {
           toast({
             title: "Error",
             description: "Passwords don't match",
-            variant: "destructive"
+            variant: "destructive",
           });
           return;
         }
@@ -59,37 +58,37 @@ const Auth = () => {
           toast({
             title: "Sign up failed",
             description: error.message,
-            variant: "destructive"
+            variant: "destructive",
           });
         } else {
           toast({
             title: "Check your email",
-            description: "We've sent you a confirmation link"
+            description: "We've sent you a confirmation link",
           });
         }
-      } else if (mode === 'signin') {
+      } else if (mode === "signin") {
         const { error } = await signIn(email, password);
         if (error) {
           toast({
             title: "Sign in failed",
             description: error.message,
-            variant: "destructive"
+            variant: "destructive",
           });
         }
-      } else if (mode === 'forgot') {
+      } else if (mode === "forgot") {
         const { error } = await resetPassword(email);
         if (error) {
           toast({
             title: "Reset failed",
             description: error.message,
-            variant: "destructive"
+            variant: "destructive",
           });
         } else {
           toast({
             title: "Check your email",
-            description: "We've sent you a password reset link"
+            description: "We've sent you a password reset link",
           });
-          setMode('signin');
+          setMode("signin");
         }
       }
     } finally {
@@ -98,10 +97,10 @@ const Auth = () => {
   };
 
   const resetForm = () => {
-    setEmail('');
-    setPassword('');
-    setConfirmPassword('');
-    setFullName('');
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setFullName("");
   };
 
   const switchMode = (newMode: AuthMode) => {
@@ -110,7 +109,7 @@ const Auth = () => {
   };
 
   const handleGoBack = () => {
-    navigate('/');
+    navigate("/");
   };
 
   return (
@@ -189,15 +188,15 @@ const Auth = () => {
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.2, duration: 0.6 }}
       >
-         <Button
-           onClick={handleGoBack}
-           variant="ghost"
-           size="sm"
-           className="text-white/80 hover:text-white hover:bg-white/10 backdrop-blur-sm transition-all duration-300"
-         >
-           <ArrowLeft className="w-4 h-4 mr-2" />
-           Back
-         </Button>
+        <Button
+          onClick={handleGoBack}
+          variant="ghost"
+          size="sm"
+          className="text-white/80 hover:text-white hover:bg-white/10 backdrop-blur-sm transition-all duration-300"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back
+        </Button>
       </motion.div>
 
       {/* Main Content */}
@@ -216,19 +215,11 @@ const Auth = () => {
               onHoverStart={() => setIsHovering(true)}
               onHoverEnd={() => setIsHovering(false)}
             >
-              <motion.span
-                animate={{
-                  textShadow: [
-                    "0 0 0px rgba(249, 115, 22, 0)",
-                    "0 0 10px rgba(249, 115, 22, 0.5)",
-                    "0 0 0px rgba(249, 115, 22, 0)",
-                  ],
-                }}
-                transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
-              >
-                Agentic
-              </motion.span>
-              <span className="text-orange-400">AI</span>
+              <img
+                src="/logo-dark-theme.png"
+                alt="Echosphere Logo"
+                className="w-[4rem] mx-auto"
+              />
             </motion.div>
             <p className="text-gray-300">AI Calling Assistant</p>
           </motion.div>
@@ -251,9 +242,9 @@ const Auth = () => {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8, duration: 0.4 }}
               >
-                {mode === 'signin' && 'Welcome Back'}
-                {mode === 'signup' && 'Join AgenticAI'}
-                {mode === 'forgot' && 'Reset Password'}
+                {mode === "signin" && "Welcome Back"}
+                {mode === "signup" && "Join Echosphere"}
+                {mode === "forgot" && "Reset Password"}
               </motion.h1>
               <motion.p
                 className="text-gray-300"
@@ -261,30 +252,35 @@ const Auth = () => {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.9, duration: 0.4 }}
               >
-                {mode === 'signin' && 'Sign in to access your AI calling dashboard'}
-                {mode === 'signup' && 'Start automating your lead qualification today'}
-                {mode === 'forgot' && 'Enter your email to receive reset instructions'}
+                {mode === "signin" &&
+                  "Sign in to access your AI calling dashboard"}
+                {mode === "signup" &&
+                  "Start automating your lead qualification today"}
+                {mode === "forgot" &&
+                  "Enter your email to receive reset instructions"}
               </motion.p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {mode === 'signup' && (
+              {mode === "signup" && (
                 <motion.div
                   className="space-y-2"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 1.0, duration: 0.4 }}
                 >
-                  <Label htmlFor="fullName" className="text-white font-medium">Full Name</Label>
-                   <Input
-                     id="fullName"
-                     type="text"
-                     value={fullName}
-                     onChange={e => setFullName(e.target.value)}
-                     required
-                     placeholder="Enter your full name"
-                     className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-400 focus:border-orange-500 focus:ring-orange-500 transition-all"
-                   />
+                  <Label htmlFor="fullName" className="text-white font-medium">
+                    Full Name
+                  </Label>
+                  <Input
+                    id="fullName"
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
+                    placeholder="Enter your full name"
+                    className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-400 focus:border-orange-500 focus:ring-orange-500 transition-all"
+                  />
                 </motion.div>
               )}
 
@@ -292,81 +288,101 @@ const Auth = () => {
                 className="space-y-2"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: mode === 'signup' ? 1.1 : 1.0, duration: 0.4 }}
+                transition={{
+                  delay: mode === "signup" ? 1.1 : 1.0,
+                  duration: 0.4,
+                }}
               >
-                <Label htmlFor="email" className="text-white font-medium">Email</Label>
-                 <Input
-                   id="email"
-                   type="email"
-                   value={email}
-                   onChange={e => setEmail(e.target.value)}
-                   required
-                   placeholder="Enter your email"
-                   className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-400 focus:border-orange-500 focus:ring-orange-500 transition-all"
-                 />
+                <Label htmlFor="email" className="text-white font-medium">
+                  Email
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder="Enter your email"
+                  className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-400 focus:border-orange-500 focus:ring-orange-500 transition-all"
+                />
               </motion.div>
 
-              {mode !== 'forgot' && (
+              {mode !== "forgot" && (
                 <motion.div
                   className="space-y-2"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: mode === 'signup' ? 1.2 : 1.1, duration: 0.4 }}
+                  transition={{
+                    delay: mode === "signup" ? 1.2 : 1.1,
+                    duration: 0.4,
+                  }}
                 >
-                  <Label htmlFor="password" className="text-white font-medium">Password</Label>
-                   <Input
-                     id="password"
-                     type="password"
-                     value={password}
-                     onChange={e => setPassword(e.target.value)}
-                     required
-                     placeholder="Enter your password"
-                     className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-400 focus:border-orange-500 focus:ring-orange-500 transition-all"
-                   />
+                  <Label htmlFor="password" className="text-white font-medium">
+                    Password
+                  </Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    placeholder="Enter your password"
+                    className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-400 focus:border-orange-500 focus:ring-orange-500 transition-all"
+                  />
                 </motion.div>
               )}
 
-              {mode === 'signup' && (
+              {mode === "signup" && (
                 <motion.div
                   className="space-y-2"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 1.3, duration: 0.4 }}
                 >
-                  <Label htmlFor="confirmPassword" className="text-white font-medium">Confirm Password</Label>
-                   <Input
-                     id="confirmPassword"
-                     type="password"
-                     value={confirmPassword}
-                     onChange={e => setConfirmPassword(e.target.value)}
-                     required
-                     placeholder="Confirm your password"
-                     className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-400 focus:border-orange-500 focus:ring-orange-500 transition-all"
-                   />
+                  <Label
+                    htmlFor="confirmPassword"
+                    className="text-white font-medium"
+                  >
+                    Confirm Password
+                  </Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    placeholder="Confirm your password"
+                    className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-400 focus:border-orange-500 focus:ring-orange-500 transition-all"
+                  />
                 </motion.div>
               )}
 
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: mode === 'signup' ? 1.4 : 1.2, duration: 0.4 }}
+                transition={{
+                  delay: mode === "signup" ? 1.4 : 1.2,
+                  duration: 0.4,
+                }}
               >
-                 <Button
-                   type="submit"
-                   className="w-full bg-gradient-to-r from-orange-500 to-orange-700 hover:from-orange-600 hover:to-orange-800 text-white font-semibold py-3 transition-all duration-300 transform hover:scale-105 relative overflow-hidden"
-                   disabled={isLoading}
-                 >
+                <Button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-orange-500 to-orange-700 hover:from-orange-600 hover:to-orange-800 text-white font-semibold py-3 transition-all duration-300 transform hover:scale-105 relative overflow-hidden"
+                  disabled={isLoading}
+                >
                   <motion.div
                     className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
                     initial={{ x: "-100%" }}
                     whileHover={{ x: "100%" }}
                     transition={{ duration: 0.6 }}
                   />
-                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {mode === 'signin' && !isLoading && 'Access Dashboard'}
-                  {mode === 'signup' && !isLoading && 'Start Free Trial'}
-                  {mode === 'forgot' && !isLoading && 'Send Reset Link'}
-                  {isLoading && 'Please wait...'}
+                  {isLoading && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  {mode === "signin" && !isLoading && "Access Dashboard"}
+                  {mode === "signup" && !isLoading && "Start Free Trial"}
+                  {mode === "forgot" && !isLoading && "Send Reset Link"}
+                  {isLoading && "Please wait..."}
                 </Button>
               </motion.div>
             </form>
@@ -377,20 +393,22 @@ const Auth = () => {
               animate={{ opacity: 1 }}
               transition={{ delay: 1.5, duration: 0.4 }}
             >
-              {mode === 'signin' && (
+              {mode === "signin" && (
                 <>
-                   <button
-                     type="button"
-                     onClick={() => switchMode('forgot')}
-                     className="text-sm text-orange-400 hover:text-orange-300 transition-colors"
-                   >
-                     Forgot your password?
-                   </button>
+                  <button
+                    type="button"
+                    onClick={() => switchMode("forgot")}
+                    className="text-sm text-orange-400 hover:text-orange-300 transition-colors"
+                  >
+                    Forgot your password?
+                  </button>
                   <div>
-                    <span className="text-sm text-gray-300">New to AgenticAI? </span>
+                    <span className="text-sm text-gray-300">
+                      New to Echosphere?{" "}
+                    </span>
                     <button
                       type="button"
-                      onClick={() => switchMode('signup')}
+                      onClick={() => switchMode("signup")}
                       className="text-sm text-orange-400 hover:text-orange-300 font-medium transition-colors"
                     >
                       Start your free trial
@@ -399,27 +417,29 @@ const Auth = () => {
                 </>
               )}
 
-              {mode === 'signup' && (
+              {mode === "signup" && (
                 <div>
-                  <span className="text-sm text-gray-300">Already have an account? </span>
-                   <button
-                     type="button"
-                     onClick={() => switchMode('signin')}
-                     className="text-sm text-orange-400 hover:text-orange-300 font-medium transition-colors"
-                   >
-                     Sign in here
-                   </button>
+                  <span className="text-sm text-gray-300">
+                    Already have an account?{" "}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => switchMode("signin")}
+                    className="text-sm text-orange-400 hover:text-orange-300 font-medium transition-colors"
+                  >
+                    Sign in here
+                  </button>
                 </div>
               )}
 
-              {mode === 'forgot' && (
-                 <button
-                   type="button"
-                   onClick={() => switchMode('signin')}
-                   className="text-sm text-orange-400 hover:text-orange-300 transition-colors"
-                 >
-                   Back to sign in
-                 </button>
+              {mode === "forgot" && (
+                <button
+                  type="button"
+                  onClick={() => switchMode("signin")}
+                  className="text-sm text-orange-400 hover:text-orange-300 transition-colors"
+                >
+                  Back to sign in
+                </button>
               )}
             </motion.div>
 

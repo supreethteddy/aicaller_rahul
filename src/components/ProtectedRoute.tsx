@@ -60,7 +60,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
             }}
             transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
           >
-            Agentic<span className="text-orange-400">AI</span>
+            Echosphere
           </motion.div>
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-orange-400" />
           <p className="text-gray-300">Loading your dashboard...</p>
